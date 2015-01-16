@@ -12,7 +12,7 @@
     "pm2" : "0.x.x"
   },
   "scripts" : {
-    "start" : "node server.js"
+    "start" : "pm2 start server.js"
   },
   "author" : "renemonroy",
   "license" : "MIT"
