@@ -1,5 +1,5 @@
 {
-  "name" : "Embedio Api Server",
+  "name" : "Embedio-Api-Server",
   "version" : "0.0.1",
   "description" : "Server that handles embeds from different newtworks.",
   "dependencies" : {
