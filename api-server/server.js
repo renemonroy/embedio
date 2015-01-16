@@ -4,9 +4,9 @@ var express = require('express'),
   bodyParser = require('body-parser'),
   mongoose = require('mongoose'),
   api = require('./api'),
-  // port = 8080,
-  // ip = '104.236.85.73',
-  port = process.env.PORT || 3000,
+  port = 8080,
+  ip = '104.236.85.73',
+  // port = process.env.PORT || 3000,
   server = null;
 
 mongoose.connect('mongodb://wally:Wvvd8jCsW8NxXD@ds053380.mongolab.com:53380/wall');
@@ -18,5 +18,5 @@ app
   .use('/api', api);
 
 server = app.listen(port, function() {
-  console.log('Listening on port %d', server.address().port);
+  console.log('Listening on port %d', ip, server.address().port);
 });
