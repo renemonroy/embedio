@@ -5,7 +5,7 @@ var express = require('express'),
   mongoose = require('mongoose'),
   api = require('./api'),
   port = 8080,
-  ip = '104.236.85.73',
+  ip = '10.132.126.219',
   // port = process.env.PORT || 3000,
   server = null;
 
