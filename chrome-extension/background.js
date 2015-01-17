@@ -18,10 +18,10 @@ Embedio = {
   * Grabs the Url to check if could build an embed from it by
   * filtering from a list of possibilities.
   */
-  audit : function(details) {
-    var hostArr = details.url.match(/^[\w-]+:\/*\[?([\w\.:-]+)\]?(?::\d+)?/)[1].split('.'),
+  audit : function(tab, cb) {
+    var hostArr = tab.url.match(/^[\w-]+:\/*\[?([\w\.:-]+)\]?(?::\d+)?/)[1].split('.'),
       host = hostArr[hostArr.length - 2],
-      url = details.url,
+      url = tab.url,
       isEmbed = false;
     switch ( host ) {
       case 'youtube' :
@@ -30,8 +30,14 @@ Embedio = {
       case 'speakerdeck' :
         isEmbed = Embedio.detect(url, embedAuditions.speakerDeck);
         break;
+      }
+    if ( isEmbed ) {
+      chrome.pageAction.show(tab.id);
+      cb({ valid : true, tab : tab });
+    } else {
+      chrome.pageAction.hide(tab.id);
+      cb({ valid : false });
     }
-    if ( isEmbed ) Embedio.enableDelivery(details.tabId);
   },
 
 
@@ -49,24 +55,51 @@ Embedio = {
 
 
   /**
-  * This function only shows the Deliver button that will be
-  * located in browser's url/search bar.
-  */
-  enableDelivery : function(id) {
-    chrome.pageAction.show(id);
-  },
-
-
-  /**
   * Sends the url to the server using Embedio's api. It will
   * build the embed code and save it in the database.
   */
   deliver : function(tab) {
-    console.log('@ Delivering url:', tab.url);
-    // xhr request...
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://www.rene.mn/api/embeds", true);
+    xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+    xhr.onreadystatechange = function() {
+      if ( xhr.readyState === 4 ) {
+        var res = JSON.parse(xhr.responseText),
+          notificationId = 'embedio-notification';
+        chrome.notifications.create(notificationId, {
+          type : 'basic',
+          iconUrl : 'icon-save-embed-38.png',
+          title : res.status,
+          message : res.message
+        }, function() {
+          setTimeout( function() {
+            chrome.notifications.clear(notificationId, function() {});
+          }, 3000);
+        });
+      }
+    }
+    xhr.send(JSON.stringify({ url : tab.url }));
   }
 
 };
 
-chrome.webNavigation.onHistoryStateUpdated.addListener(Embedio.audit);
-chrome.pageAction.onClicked.addListener(Embedio.deliver);
+// chrome.webNavigation.onHistoryStateUpdated.addListener(Embedio.audit);
+chrome.tabs.onUpdated.addListener( function( tabId, changeInfo, tab) {
+  Embedio.audit(tab, function(res) {
+    console.log('@ Valid url:', res.valid);
+  });
+});
+
+chrome.pageAction.onClicked.addListener( function(tab) {
+  Embedio.deliver(tab);
+});
+
+chrome.commands.onCommand.addListener( function(command) {
+  if ( command === 'toggle-feature-foo' ) {
+    chrome.tabs.query({ active : true }, function(tab) {
+      Embedio.audit(tab[0], function(res) {
+        if ( res.valid ) Embedio.deliver(res.tab);
+      });
+    });
+  }
+});

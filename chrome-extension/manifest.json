@@ -1,7 +1,7 @@
 {
   "manifest_version" : 2,
   "name" : "Embedio",
-  "version" : "0.5",
+  "version" : "0.7.5",
   "description" : "Save and manage embeds",
   "background" : {
     "scripts" : ["background.js"],
@@ -14,6 +14,14 @@
   "permissions" : [
     "tabs",
     "webNavigation",
-    "http://www.rene.mn/"
-  ]
+    "notifications"
+  ],
+  "commands" : {
+    "toggle-feature-foo" : {
+      "suggested_key" : {
+        "default" : "Ctrl+Shift+O"
+      },
+      "description" : "Execute to save an embed."
+    }
+  }
 }
