@@ -17,6 +17,6 @@ app
   .use(bodyParser.json())
   .use('/api', api);
 
-server = app.listen(port, function() {
-  console.log('Listening on port %d', ip, server.address().port);
+server = app.listen(port, ip, function() {
+  console.log('Listening on port %d', server.address().port);
 });
