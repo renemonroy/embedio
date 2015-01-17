@@ -1,0 +1,19 @@
+{
+  "manifest_version" : 2,
+  "name" : "Embedio",
+  "version" : "0.5",
+  "description" : "Save and manage embeds",
+  "background" : {
+    "scripts" : ["background.js"],
+    "persistent" : false
+  },
+  "page_action" : {
+    "default_icon" : "icon-save-embed-19.png",
+    "default_title" : "Save this embed!"
+  },
+  "permissions" : [
+    "tabs",
+    "webNavigation",
+    "http://www.rene.mn/"
+  ]
+}
