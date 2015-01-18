@@ -7,7 +7,7 @@ var express = require('express'),
   api = require('./routes/api'),
   proxy = require('proxy-middleware'),
   url = require('url'),
-  port = 8081,
+  port = 8080,
   ip = '10.132.126.219';
 
 mongoose.connect('mongodb://wally:Wvvd8jCsW8NxXD@ds053380.mongolab.com:53380/wall');
