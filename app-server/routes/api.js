@@ -1,6 +1,6 @@
 var express = require('express'),
   logger = require('morgan'),
-  Embed = require('./embed'),
+  Embed = require('../models/embed'),
   oembed = require('oembed-auto');
 
 module.exports = ( function() {
@@ -10,16 +10,16 @@ module.exports = ( function() {
   api.use(logger('short'));
 
   /**
-   * Main API route that responds with an empty object as JSON, this by
-   * following RESTful "best practices".
-   */
+  * Main API route that responds with an empty object as JSON, this by
+  * following RESTful "best practices".
+  */
   api.route('/').get( function(req, res) {
     res.json({});
   });
 
   /**
-   * Responds with an array list of all the embeds saved on the database.
-   */
+  * Responds with an array list of all the embeds saved on the database.
+  */
   api.route('/embeds').get( function(req, res) {
     Embed.find( function(err, embeds) {
       if (err) res.send(err);
@@ -28,9 +28,9 @@ module.exports = ( function() {
   });
 
   /**
-   * Saves a new embed into the database and responds with a message as
-   * notification for front.
-   */
+  * Saves a new embed into the database and responds with a message as
+  * notification for front.
+  */
   api.route('/embeds').post( function(req, res) {
     oembed(req.body.url, function(oembedError, d) {
       if (oembedError) res.send(oembedError);
@@ -59,9 +59,9 @@ module.exports = ( function() {
   });
 
   /**
-   * Responds an embed found from its specific id added by the post on
-   * the database.
-   */
+  * Responds an embed found from its specific id added by the post on
+  * the database.
+  */
   api.route('/embeds/:embed_id').get( function(req, res) {
     Embed.findById(req.params.embed_id, function(err, e) {
       if (err) res.send(err);
@@ -70,8 +70,8 @@ module.exports = ( function() {
   });
 
   /**
-   * Deletes an embed from the database found using its specific id.
-   */
+  * Deletes an embed from the database found using its specific id.
+  */
   api.route('/embeds/:embed_id').delete( function(req, res) {
     Embed.remove({ _id : req.params.embed_id }, function(err) {
       if (err) res.send(err);

@@ -1,0 +1,30 @@
+* {
+  -webkit-box-sizing : border-box;
+  -moz-box-sizing : border-box;
+  box-sizing : border-box;
+  outline : none;
+  -webkit-font-smoothing: antialiased;
+  margin : 0;
+  padding : 0;
+}
+
+.embed {
+  padding : 5px 10px;
+
+  iframe {
+    width : 100%!important;
+    height : 100%!important;
+  }
+
+  .embed-video {
+    width : 500px;
+    height : 317px;
+    margin : 0 auto;
+  }
+
+  .embed-rich {
+    width : 500px;
+    height : 436px;
+    margin : 0 auto;
+  }
+}

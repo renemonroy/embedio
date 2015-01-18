@@ -1,5 +1,5 @@
 {
-  "name" : "Embedio-Api-Server",
+  "name" : "Embedio-App-Server",
   "version" : "0.0.1",
   "description" : "Server that handles embeds from different newtworks.",
   "dependencies" : {
@@ -9,7 +9,10 @@
     "mongoose": "3.8.x",
     "morgan": "1.x.x",
     "oembed-auto": "0.0.x",
-    "pm2" : "0.x.x"
+    "pm2" : "0.x.x",
+    "ejs" : "2.x.x",
+    "proxy-middleware" : "0.x.x",
+    "url" : "0.x.x"
   },
   "scripts" : {
     "start" : "pm2 start server.js"

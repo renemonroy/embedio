@@ -1,5 +1,5 @@
 var mongoose = require('mongoose'),
-  Schema = mongoose.Schema;
+Schema = mongoose.Schema;
 
 var EmbedSchema = new Schema({
   createdAt : { type : Date, default : Date.now },

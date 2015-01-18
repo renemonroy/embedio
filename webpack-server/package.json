@@ -1,0 +1,25 @@
+{
+  "name" : "Embedio-Webpack-Server",
+  "version" : "0.0.1",
+  "description" : "Server that shows front assets to manipulate api.",
+  "dependencies" : {
+    "express" : "4.x.x",
+    "webpack-dev-server" : "0.x.x",
+    "webpack" : "1.x.x",
+    "bundle-loader" : "^0.5.0",
+    "css-loader" : "0.8.x",
+    "file-loader" : "0.5.x",
+    "json-loader" : "0.5.x",
+    "jsx-loader" : "0.12.x",
+    "react" : "0.12.x",
+    "reflux": "0.1.x",
+    "sass-loader": "^0.2.x",
+    "style-loader": "0.8.x",
+    "url-loader": "0.5.x"
+  },
+  "scripts" : {
+    "start" : "pm2 start webpack-server.js"
+  },
+  "author" : "renemonroy",
+  "license" : "MIT"
+}
