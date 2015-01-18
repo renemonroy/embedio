@@ -20,7 +20,7 @@ app
   .use(bodyParser.urlencoded({ extended : true }))
   .use(bodyParser.json())
   .use(express.static('public'))
-  .use('/assets', proxy(url.parse('http://localhost:8080/assets')))
+  .use('/assets', proxy(url.parse('http://127.0.0.1:8080/assets')))
   .use('/', webRouter)
   .use('/api', api);
 
