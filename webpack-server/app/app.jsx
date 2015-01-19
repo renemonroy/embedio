@@ -46,7 +46,7 @@ var loadApp = function() {
   * this at Apiary on MyWall project.
   */
   var EmbedsStore = Reflux.createStore({
-    apiUrl : 'http://rene.mn/api/embeds',
+    apiUrl : window._INFO.ctx + '/api/embeds',
     // apiUrl : 'http://localhost:8080/api/embeds',
     init : function() {
       this.listenTo(Actions.getEmbeds, this.getEmbeds);
@@ -157,8 +157,8 @@ var loadApp = function() {
         embedsList = this.state.embedsList, embeds;
       if ( embedsList.length > 0 ) {
         embeds = embedsList.map(function(embed, i) {
-          var onDestroy = comp.destroyEmbed.bind(comp, embed._id);
-          return <EmbedEl ref={'embed-' + embed._id} key={embed._id} params={embed} onDestroy={onDestroy} />;
+          var destroyEmbed = comp.destroyEmbed.bind(comp, embed._id);
+          return <EmbedEl ref={'embed-' + embed._id} key={embed._id} params={embed} onDestroy={destroyEmbed} />;
         });
       }
       return embeds;

@@ -1,5 +1,11 @@
 var express = require('express'),
-  logger = require('morgan');
+  logger = require('morgan'),
+  config = require('../config.json');
+
+var info = {
+  env : process.env.NODE_ENV,
+  ctx : 'http://' + config.ip + ':' + config.port
+};
 
 module.exports = ( function() {
 
@@ -8,7 +14,7 @@ module.exports = ( function() {
   webRouter.use(logger('short'));
 
   webRouter.route('/embeds').get( function(req, res) {
-    res.render('index');
+    res.render('index', { info : JSON.stringify(info) });
   });
 
   return webRouter;
