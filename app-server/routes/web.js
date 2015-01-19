@@ -6,7 +6,7 @@ var ctx = function() {
   myCtx = '';
   switch (process.env.NODE_ENV) {
     case 'development' :
-      myCtx = 'http://localhost:3000';
+      myCtx = 'http://localhost:8080';
       break;
     case 'production' :
       myCtx = 'http://rene.mn';
