@@ -43,4 +43,4 @@ bower_components/
 
 # Config Files #
 ######################
-*/config.json
+app-server/config.json
