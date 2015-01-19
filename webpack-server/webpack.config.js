@@ -1,6 +1,10 @@
+var config = require('./config');
+
 var path = require('path'),
   webpack = require('webpack'),
-  devServer = 'http://10.132.126.219:8081';
+  devServer = config.ip + ':' + config.port;
+  // devServer = '127.0.0.1:8081';
+  // devServer = 'http://10.132.126.219:8081';
 
 var escapeRegExpString = function(str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
@@ -10,17 +14,39 @@ var pathToRegExp = function(p) {
   return new RegExp("^" + escapeRegExpString(p));
 };
 
-function getEntry(type) {
+var getEntry = function(type) {
   var entry = {
     "vendor" : ['react/addons', 'reflux'],
     "app" : ['./app/app.jsx']
   };
-  if ( type === 'dev' ) {
+  if ( type === 'development' ) {
     for ( var bundleName in entry ) {
       entry[bundleName].push("webpack/hot/dev-server");
     }
   }
+  console.log('>>>>> Entry', entry);
   return entry;
+};
+
+var getPlugins = function(type) {
+  var arr = [];
+  arr.push(new webpack.HotModuleReplacementPlugin());
+  arr.push(new webpack.optimize.DedupePlugin());
+  arr.push(new webpack.optimize.OccurenceOrderPlugin());
+  if ( type === 'production') {
+    arr.push(new webpack.optimize.UglifyJsPlugin({ output : { comments : false } }));
+  }
+  arr.push(new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 20 }));
+  arr.push(new webpack.optimize.CommonsChunkPlugin(/* chunkName= */"vendor", /* filename= */"vendor.bundle.js", Infinity));
+  return arr;
+  // [
+  // new webpack.optimize.DedupePlugin(),
+  // new webpack.optimize.OccurenceOrderPlugin(),
+  // // new webpack.optimize.UglifyJsPlugin({ output : { comments : false } }),
+  // new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 20 }),
+  // // new webpack.optimize.CommonsChunkPlugin("commons", "commons.bundle.js", Infinity),
+  // new webpack.optimize.CommonsChunkPlugin(/* chunkName= */"vendor", /* filename= */"vendor.bundle.js", Infinity)
+  // ]
 };
 
 module.exports = function(type) {
@@ -56,13 +82,6 @@ module.exports = function(type) {
       modulesDirectories : ['node_modules']
     },
 
-    plugins : [
-    new webpack.optimize.DedupePlugin(),
-    new webpack.optimize.OccurenceOrderPlugin(),
-    // new webpack.optimize.UglifyJsPlugin({ output : { comments : false } }),
-    new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 20 }),
-    // new webpack.optimize.CommonsChunkPlugin("commons", "commons.bundle.js", Infinity),
-    new webpack.optimize.CommonsChunkPlugin(/* chunkName= */"vendor", /* filename= */"vendor.bundle.js", Infinity)
-    ]
+    plugins : getPlugins(type)
   };
 };
