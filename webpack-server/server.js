@@ -17,4 +17,4 @@ if ( process.env.NODE === 'development' ) {
 }
 
 var server = new WebpackDevServer(webpack(webpackConfig), bundleConfig);
-server.listen(8081, config.ip, function() {});
+server.listen(config.port, config.ip, function() {});

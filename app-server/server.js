@@ -15,6 +15,7 @@ var express = require('express'),
 mongoose.connect('mongodb://wally:Wvvd8jCsW8NxXD@ds053380.mongolab.com:53380/wall');
 
 app
+  .set('views', __dirname + '/views')
   .set('view engine', 'ejs');
 
 app
