@@ -7,6 +7,7 @@ var webpack = require('webpack'),
 
 var bundleConfig = {
   contentBase : __dirname,
+  hot : process.env.NODE_ENV === 'production' ? true : false,
   quiet : false,
   noInfo : false,
   publicPath : "/assets",

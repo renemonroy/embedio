@@ -125,31 +125,34 @@ var loadApp = function() {
       return { embedsList : [] };
     },
     componentDidMount : function() {
-      this.listenTo(EmbedsStore, this._embedsStoreHandler);
+      this.listenTo(EmbedsStore, this.embedsStoreHandler);
     },
-    _embedsStoreHandler : function(e) {
+    embedsStoreHandler : function(e) {
       if (e) {
         switch (e.storeAction) {
           case 'getEmbeds' :
-            console.log('@ Embeds List:', e.res.embeds);
             this.setState({ embedsList : e.res.embeds });
             break;
           case 'destroyEmbed' :
-            console.log('@ Embed List Updated:', e.res.embedId);
-            var list = this.state.embedsList, listSize = list.length;
-            for ( var i=0; i < listSize; i++ ) {
-              if ( list[i]._id == e.res.embedId ) {
-                list.splice(i, 1);
-                break;
-              }
-            }
-            this.setState({ embedsList : list });
+            this.unmountEmbed(e.res.embedId);
             break;
         }
       }
     },
     destroyEmbed : function(id) {
       Actions.deleteEmbed(id);
+    },
+    unmountEmbed : function(id) {
+      var list = this.state.embedsList,
+        listSize = list.length;
+      for ( var i=0; i < listSize; i++ ) {
+        if ( list[i]._id == id ) {
+          list.splice(i, 1);
+          break;
+        }
+      }
+      this.setState({ embedsList : list });
+      return this;
     },
     _renderEmbeds : function() {
       var comp = this,
