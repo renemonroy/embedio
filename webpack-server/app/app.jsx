@@ -46,7 +46,6 @@ var loadApp = function() {
   * this at Apiary on MyWall project.
   */
   var EmbedsStore = Reflux.createStore({
-    // apiUrl : "http://private-0bd2a-mywall.apiary-mock.com/embeds",
     apiUrl : 'http://rene.mn/api/embeds',
     // apiUrl : 'http://localhost:8080/api/embeds',
     init : function() {
