@@ -14,7 +14,8 @@ var loadApp = function() {
   * depending the case of use.
   */
   var Actions = Reflux.createActions([
-    "getEmbedsCollection",
+    "getEmbeds",
+    "deleteEmbed"
   ]);
 
   /* ----------------------------------------------------------- +
@@ -25,10 +26,10 @@ var loadApp = function() {
   * Ajax Mixin. Created to be used by any component and reflux
   * store. Components should relie on Reflux.
   */
-  var AjaxMixin = {
-    get : function(url, callback) {
+  var RESTMixin = {
+    req : function(type, url, callback) {
       var xhr = new XMLHttpRequest();
-      xhr.open('get', url, true);
+      xhr.open(type, url, true);
       xhr.onreadystatechange = function () {
         if (this.readyState == 4) callback(null, this.responseText);
       };
@@ -47,17 +48,30 @@ var loadApp = function() {
   var EmbedsStore = Reflux.createStore({
     // apiUrl : "http://private-0bd2a-mywall.apiary-mock.com/embeds",
     apiUrl : 'http://rene.mn/api/embeds',
+    // apiUrl : 'http://localhost:8080/api/embeds',
     init : function() {
-      this.listenTo(Actions.getEmbedsCollection, this.getEmbeds);
+      this.listenTo(Actions.getEmbeds, this.getEmbeds);
+      this.listenTo(Actions.deleteEmbed, this.deleteEmbed);
     },
-    getEmbeds: function(e) {
+    getEmbeds : function(e) {
       var store = this;
-      AjaxMixin.get(this.apiUrl, function(err, res) {
+      RESTMixin.req('GET', this.apiUrl, function(err, res) {
         var obj = {};
         if (err) obj.err = err;
         if (res) obj.res = JSON.parse(res);
         obj.storeAction = 'getEmbeds';
         console.log('@ Store', obj);
+        store.trigger(obj);
+      });
+    },
+    deleteEmbed : function(id) {
+      var store = this;
+      RESTMixin.req('DELETE', this.apiUrl + '/' + id, function(err, res) {
+        var obj = {};
+        if (err) obj.err = err;
+        if (res) obj.res = JSON.parse(res);
+        obj.storeAction = 'destroyEmbed';
+        console.log('@ Embed deleted', obj);
         store.trigger(obj);
       });
     }
@@ -72,7 +86,7 @@ var loadApp = function() {
   * parent component handles their properties.
   */
   var EmbedEl = React.createClass({
-    _renderHtml : function(ps) {
+    _renderEmbed : function(ps) {
       switch (ps.type) {
         case 'video' :
           return <div className="embed-video" dangerouslySetInnerHTML={{__html: ps.html }}></div>;
@@ -90,11 +104,13 @@ var loadApp = function() {
     },
     render : function() {
       var ps = this.props.params;
+      console.log(this.props);
       return (
         <li {...this.props} className="embed">
-          { this._renderHtml(ps) }
+          { this._renderEmbed(ps) }
           <div className="embed-footer">
-            <h4>{ ps.provider_name }</h4>
+            <h4>{ ps.title }</h4>
+            <button type="button" onClick={this.props.onDestroy}>Delete</button>
           </div>
         </li>
       );
@@ -114,16 +130,36 @@ var loadApp = function() {
       this.listenTo(EmbedsStore, this._embedsStoreHandler);
     },
     _embedsStoreHandler : function(e) {
-      if ( e && e.storeAction == 'getEmbeds' ) {
-        console.log('@ Embeds List:', e.res);
-        this.setState({ embedsList : e.res });
+      if (e) {
+        switch (e.storeAction) {
+          case 'getEmbeds' :
+            console.log('@ Embeds List:', e.res.embeds);
+            this.setState({ embedsList : e.res.embeds });
+            break;
+          case 'destroyEmbed' :
+            console.log('@ Embed List Updated:', e.res.embedId);
+            var list = this.state.embedsList, listSize = list.length;
+            for ( var i=0; i < listSize; i++ ) {
+              if ( list[i]._id == e.res.embedId ) {
+                list.splice(i, 1);
+                break;
+              }
+            }
+            this.setState({ embedsList : list });
+            break;
+        }
       }
     },
+    destroyEmbed : function(id) {
+      Actions.deleteEmbed(id);
+    },
     _renderEmbeds : function() {
-      var embedsList = this.state.embedsList, embeds;
+      var comp = this,
+        embedsList = this.state.embedsList, embeds;
       if ( embedsList.length > 0 ) {
         embeds = embedsList.map(function(embed, i) {
-          return <EmbedEl key={"embed-" + i} params={embed} />;
+          var onDestroy = comp.destroyEmbed.bind(comp, embed._id);
+          return <EmbedEl ref={'embed-' + embed._id} key={embed._id} params={embed} onDestroy={onDestroy} />;
         });
       }
       return embeds;
@@ -173,7 +209,7 @@ var loadApp = function() {
   */
   var AppEl = React.createClass({
     componentDidMount : function() {
-      Actions.getEmbedsCollection({ dispatcher : 'AppEl' });
+      Actions.getEmbeds({ dispatcher : 'AppEl' });
     },
     render : function() {
       return (
