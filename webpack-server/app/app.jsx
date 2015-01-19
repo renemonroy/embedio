@@ -47,7 +47,6 @@ var loadApp = function() {
   */
   var EmbedsStore = Reflux.createStore({
     apiUrl : window._INFO.ctx + '/api/embeds',
-    // apiUrl : 'http://localhost:8080/api/embeds',
     init : function() {
       this.listenTo(Actions.getEmbeds, this.getEmbeds);
       this.listenTo(Actions.deleteEmbed, this.deleteEmbed);
