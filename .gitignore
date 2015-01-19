@@ -44,3 +44,4 @@ bower_components/
 # Config Files #
 ######################
 app-server/config.json
+webpack-server/config.json
