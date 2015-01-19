@@ -40,4 +40,8 @@ Thumbs.db
 ######################
 node_modules/
 bower_components/
-webpack-server/config.js
+
+# Config Files #
+######################
+*/webpack-server/config.json
+*/app-server/config.json
