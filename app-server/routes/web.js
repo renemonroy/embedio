@@ -2,9 +2,22 @@ var express = require('express'),
   logger = require('morgan'),
   config = require('../config.json');
 
+var ctx = function() {
+  myCtx = '';
+  switch (process.env.NODE_ENV) {
+    case 'development' :
+      myCtx = 'http://localhost:3000';
+      break;
+    case 'production' :
+      myCtx = 'http://rene.mn';
+      break;
+  }
+  return myCtx;
+};
+
 var info = {
   env : process.env.NODE_ENV,
-  ctx : 'http://' + config.ip + ':' + config.port
+  ctx : ctx()
 };
 
 module.exports = ( function() {
