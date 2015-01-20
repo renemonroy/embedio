@@ -12,6 +12,16 @@ embedAuditions = {
   ],
   codePen : [
     '^http(?:s)?://codepen\\.io/[^#?/]+/pen/.+$'
+  ],
+  vimeo : [
+    '^http(?:s)?://(?:www\\.)?vimeo\\.com/.+$',
+    '^http(?:s)?://player\\.vimeo\\.com/.+$'
+  ],
+  slideshare : [
+    '^http://www\\.slideshare\\.net/.+$'
+  ],
+  kickstarter : [
+    '^http(?:s)?://[-\\w]+\\.kickstarter\\.com/projects/[^#?/]+/.+$'
   ]
 };
 
@@ -34,7 +44,13 @@ Embedio = {
         isEmbed = Embedio.detect(url, embedAuditions.speakerDeck);
         break;
       case 'codepen' :
-        isEmbed = Embedio.detect(url, embedAuditions.codePen)
+        isEmbed = Embedio.detect(url, embedAuditions.codePen);
+      case 'vimeo' :
+        isEmbed = Embedio.detect(url, embedAuditions.vimeo);
+      case 'slideshare' :
+        isEmbed = Embedio.detect(url, embedAuditions.slideshare);
+      case 'kickstarter' :
+        isEmbed = Embedio.detect(url, embedAuditions.kickstarter);
     }
     if ( isEmbed ) {
       chrome.pageAction.show(tab.id);
