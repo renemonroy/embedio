@@ -9,6 +9,9 @@ embedAuditions = {
   ],
   speakerDeck : [
     '^http(?:s)?://speakerdeck\\.com/.+$'
+  ],
+  codePen : [
+    '^http(?:s)?://codepen\\.io/[^#?/]+/pen/.+$'
   ]
 };
 
@@ -30,7 +33,9 @@ Embedio = {
       case 'speakerdeck' :
         isEmbed = Embedio.detect(url, embedAuditions.speakerDeck);
         break;
-      }
+      case 'codepen' :
+        isEmbed = Embedio.detect(url, embedAuditions.codePen)
+    }
     if ( isEmbed ) {
       chrome.pageAction.show(tab.id);
       cb({ valid : true, tab : tab });
