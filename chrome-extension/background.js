@@ -45,12 +45,16 @@ Embedio = {
         break;
       case 'codepen' :
         isEmbed = Embedio.detect(url, embedAuditions.codePen);
+        break;
       case 'vimeo' :
         isEmbed = Embedio.detect(url, embedAuditions.vimeo);
+        break;
       case 'slideshare' :
         isEmbed = Embedio.detect(url, embedAuditions.slideshare);
+        break;
       case 'kickstarter' :
         isEmbed = Embedio.detect(url, embedAuditions.kickstarter);
+        break;
     }
     if ( isEmbed ) {
       chrome.pageAction.show(tab.id);

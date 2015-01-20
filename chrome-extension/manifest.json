@@ -1,7 +1,7 @@
 {
   "manifest_version" : 2,
   "name" : "Embedio",
-  "version" : "0.7.9",
+  "version" : "0.8.2",
   "description" : "Save and manage embeds",
   "background" : {
     "scripts" : ["background.js"],
