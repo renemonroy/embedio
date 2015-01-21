@@ -21,8 +21,11 @@ module.exports = ( function() {
   * Responds with an array list of all the embeds saved on the database.
   */
   api.route('/embeds').get( function(req, res) {
-    Embed.find(function(err, embeds) {
-      console.log('abalskdalsk');
+    // Embed.find({}, function(err, embeds) {
+    //   if (err) res.send(err);
+    //   res.json({ embeds : embeds });
+    // });
+    Embed.find().sort(['createdAt', 'descending']).all(function(embeds) {
       if (err) res.send(err);
       res.json({ embeds : embeds });
     });
@@ -76,12 +79,7 @@ module.exports = ( function() {
   api.route('/embeds/:embed_id').delete( function(req, res) {
     Embed.remove({ _id : req.params.embed_id }, function(err) {
       if (err) res.send(err);
-      Embed.find(function(err, embeds) {
-        if (err) res.send(err);
-        res.json({ status : 'success', message : 'Embed deleted!', embedId : req.params.embed_id });
-        // res.json({ embeds : embeds });
-      });
-      // res.json({ status : 'success', message : 'Embed deleted!' });
+      res.json({ status : 'success', message : 'Embed deleted!', embedId : req.params.embed_id });
     });
   });
 
