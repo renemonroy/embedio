@@ -4,7 +4,9 @@ var express = require('express'),
   oembed = require('oembed-auto');
 
 var setEmbedSize = function(embedHTML) {
-  return embedHTML.replace(/(width=")\d+("\W+height=")\d+/, '$1100%$2100%');
+  return embedHTML
+      .replace(/(width\s*=\s*["'])[0-9]+(["'])/ig, '$1100%"')
+      .replace(/(height\s*=\s*["'])[0-9]+(["'])/ig, '$1100%"');
 };
 
 module.exports = ( function() {
