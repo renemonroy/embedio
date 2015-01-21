@@ -32,29 +32,36 @@ module.exports = ( function() {
   * notification for front.
   */
   api.route('/embeds').post( function(req, res) {
-    oembed(req.body.url, function(oembedError, d) {
-      if (oembedError) res.send(oembedError);
-      var e = new Embed();
-      e.url           = req.body.url;
-      e.createdAt     = new Date();
-      e.image         = d.url ? d.url : '';
-      e.type          = d.type;
-      e.title         = d.title ? d.title : '';
-      e.width         = d.width ? d.width : 0;
-      e.height        = d.height ? d.height : 0;
-      e.html          = d.html ? d.html : '';
-      e.author.name   = d.author_name ? d.author_name : '';
-      e.author.url    = d.author_url ? d.author_url : '';
-      e.provider.name = d.provider_name;
-      e.provider.url  = d.provider_url;
-      e.thumb.url     = d.thumbnail_url ? d.thumbnail_url : '';
-      e.thumb.width   = d.thumbnail_width ? d.thumbnail_width : 0;
-      e.thumb.height  = d.thumbnail_height ? d.thumbnail_height : 0;
-      e.save(function(saveError) {
-        if (saveError) res.send(saveError);
-        console.log('>>> Embed created:', e);
-        res.json({ status : 'success', message : 'Embed created!', embed : e });
-      });
+    Embed.findOne({ url : req.body.url }, function(findError, embedFound) {
+      if ( embedFound ) {
+        if (findError) res.send(findError);
+        res.json({ status : 'fail', message : 'You had this Embed already.' });
+      } else {
+        oembed(req.body.url, function(oembedError, d) {
+          if (oembedError) res.send(oembedError);
+          var e = new Embed();
+          e.url           = req.body.url;
+          e.createdAt     = new Date();
+          e.image         = d.url ? d.url : '';
+          e.type          = d.type;
+          e.title         = d.title ? d.title : '';
+          e.width         = d.width ? d.width : 0;
+          e.height        = d.height ? d.height : 0;
+          e.html          = d.html ? d.html : '';
+          e.author.name   = d.author_name ? d.author_name : '';
+          e.author.url    = d.author_url ? d.author_url : '';
+          e.provider.name = d.provider_name;
+          e.provider.url  = d.provider_url;
+          e.thumb.url     = d.thumbnail_url ? d.thumbnail_url : '';
+          e.thumb.width   = d.thumbnail_width ? d.thumbnail_width : 0;
+          e.thumb.height  = d.thumbnail_height ? d.thumbnail_height : 0;
+          e.save(function(saveError) {
+            if (saveError) res.send(saveError);
+            console.log('>>> Embed created:', e);
+            res.json({ status : 'success', message : 'Embed created!', embed : e });
+          });
+        });
+      }
     });
   });
 
