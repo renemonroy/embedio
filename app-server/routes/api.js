@@ -3,8 +3,8 @@ var express = require('express'),
   Embed = require('../models/embed'),
   oembed = require('oembed-auto');
 
-var setEmbedSize = function(embedHTML, embedWidth, embedHeight) {
-  return embedHTML.replace(/(width=")\d+("\W+height=")\d+/, '$1' + embedWidth + '$2' + embedHeight);
+var setEmbedSize = function(embedHTML) {
+  return embedHTML.replace(/(width=")\d+("\W+height=")\d+/, '$1100%$2100%');
 };
 
 module.exports = ( function() {
@@ -51,7 +51,7 @@ module.exports = ( function() {
           e.title         = d.title ? d.title : '';
           e.width         = d.width ? d.width : '100%';
           e.height        = d.height ? d.height : '100%';
-          e.html          = d.html ? setEmbedSize(d.html, e.width, e.height) : '';
+          e.html          = d.html ? setEmbedSize(d.html) : '';
           e.author.name   = d.author_name ? d.author_name : '';
           e.author.url    = d.author_url ? d.author_url : '';
           e.provider.name = d.provider_name;
