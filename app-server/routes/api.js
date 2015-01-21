@@ -21,12 +21,7 @@ module.exports = ( function() {
   * Responds with an array list of all the embeds saved on the database.
   */
   api.route('/embeds').get( function(req, res) {
-    // Embed.find({}, function(err, embeds) {
-    //   if (err) res.send(err);
-    //   res.json({ embeds : embeds });
-    // });
     Embed.find({}).sort('-createdAt').exec(function(err, embeds) {
-      debugger;
       if (err) res.send(err);
       res.json({ embeds : embeds });
     });
