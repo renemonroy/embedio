@@ -25,7 +25,8 @@ module.exports = ( function() {
     //   if (err) res.send(err);
     //   res.json({ embeds : embeds });
     // });
-    Embed.find({}).sort({ createdAt : -1 }).all(function(embeds) {
+    Embed.find({}).sort('-createdAt').exec(function(err, embeds) {
+      debugger;
       if (err) res.send(err);
       res.json({ embeds : embeds });
     });
