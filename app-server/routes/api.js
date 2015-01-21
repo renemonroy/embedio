@@ -33,8 +33,8 @@ module.exports = ( function() {
   */
   api.route('/embeds').post( function(req, res) {
     Embed.findOne({ url : req.body.url }, function(findError, embedFound) {
+      if (findError) res.send(findError);
       if ( embedFound ) {
-        if (findError) res.send(findError);
         res.json({ status : 'fail', message : 'You had this Embed already.' });
       } else {
         oembed(req.body.url, function(oembedError, d) {
