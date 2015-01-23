@@ -84,16 +84,30 @@ var loadApp = function() {
   * parent component handles their properties.
   */
   var EmbedEl = React.createClass({
+    getDefaultProps : function() {
+      return { defaultWidth : 480 };
+    },
+    setSize : function() {
+      var pms = this.props.params,
+        eDefault = this.props.defaultWidth;
+      if ( pms.width <= eDefault )
+        return { width : pms.width, height : pms.height };
+      else {
+        var newHeight = (pms.height/pms.width) * eDefault;
+        return { width : eDefault, height : newHeight};
+      }
+    },
     _renderEmbed : function(ps) {
-      switch (ps.type) {
+      var ps = this.props;
+      switch (ps.params.type) {
         case 'video' :
-          return <div className="embed-video" dangerouslySetInnerHTML={{__html: ps.html }}></div>;
+          return <div className="embed-video" style={this.setSize()} dangerouslySetInnerHTML={{__html: ps.params.html }}></div>;
           break;
         case 'photo' :
-          return <div className="embed-image"><img src={ps.url} /></div>;
+          return <div className="embed-image" style={this.setSize()}><img src={ps.params.url} /></div>;
           break;
         case 'rich' :
-          return <div className="embed-rich" dangerouslySetInnerHTML={{__html: ps.html }}></div>;
+          return <div className="embed-rich" style={this.setSize()} dangerouslySetInnerHTML={{__html: ps.params.html }}></div>;
           break;
         default :
           return null;
@@ -101,13 +115,12 @@ var loadApp = function() {
       }
     },
     render : function() {
-      var ps = this.props.params;
-      console.log(this.props);
+      var ps = this.props;
       return (
         <li {...this.props} className="embed">
-          { this._renderEmbed(ps) }
+          { this._renderEmbed() }
           <div className="embed-footer">
-            <h4>{ ps.title }</h4>
+            <h4>{ ps.params.title }</h4>
             <button type="button" onClick={this.props.onDestroy}>Delete</button>
           </div>
         </li>
