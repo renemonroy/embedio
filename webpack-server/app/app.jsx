@@ -84,18 +84,20 @@ var loadApp = function() {
   * parent component handles their properties.
   */
   var EmbedEl = React.createClass({
-    getDefaultProps : function() {
-      return { defaultWidth : 480 };
-    },
     setSize : function() {
       var pms = this.props.params,
-        eDefault = this.props.defaultWidth;
+        eDefault = pms.defaultWidth;
       if ( pms.width <= eDefault )
         return { width : pms.width, height : pms.height };
       else {
         var newHeight = (pms.height/pms.width) * eDefault;
         return { width : eDefault, height : newHeight};
       }
+    },
+    openEmbed : function(e) {
+      e.preventDefault();
+      var pms = this.props.params;
+      console.log('Embed:', pms);
     },
     _renderEmbed : function(ps) {
       var ps = this.props;
@@ -118,10 +120,13 @@ var loadApp = function() {
       var ps = this.props;
       return (
         <li {...this.props} className="embed">
-          { this._renderEmbed() }
+          <div className="embed-body">
+            { this._renderEmbed() }
+            <div className="embed-overlay" onClick={this.openEmbed}></div>
+          </div>
           <div className="embed-footer">
             <h4>{ ps.params.title }</h4>
-            <button type="button" onClick={this.props.onDestroy}>Delete</button>
+          {/*<button type="button" onClick={this.props.onDestroy}>Delete</button>*/}
           </div>
         </li>
       );
@@ -169,10 +174,13 @@ var loadApp = function() {
     },
     _renderEmbeds : function() {
       var comp = this,
-        embedsList = this.state.embedsList, embeds;
+        embedsList = this.state.embedsList, embeds,
+        embedDefaultWidth = this.props.defaultWidth - 40;
+
       if ( embedsList.length > 0 ) {
         embeds = embedsList.map(function(embed, i) {
           var destroyEmbed = comp.destroyEmbed.bind(comp, embed._id);
+          embed.defaultWidth = comp.props.defaultWidth;
           return <EmbedEl ref={'embed-' + embed._id} key={embed._id} params={embed} onDestroy={destroyEmbed} />;
         });
       }
@@ -192,27 +200,23 @@ var loadApp = function() {
   * live and get rendered like Embeds List.
   */
   var MainEl = React.createClass({
+    getInitialState : function() {
+      return { defaultWidth : 320 };
+    },
+    changeWidth : function(e) {
+      this.setState({ defaultWidth : e.target.value });
+    },
     render : function() {
+      var st = this.state,
+        objStyles = {
+          width : st.defaultWidth + 'px',
+          height : window.innerHeight
+        };
       return (
         <section className="main">
-          <EmbedsListEl />
+          <input type="range" min={320} max={480} onChange={this.changeWidth} />
+          <EmbedsListEl style={objStyles} defaultWidth={st.defaultWidth - 40}/>
         </section>
-      );
-    }
-  });
-
-  /**
-  * Header Component. Is the header view where controls and other
-  * components get rendered.
-  */
-  var HeaderEl = React.createClass({
-    render : function() {
-      return (
-        <header>
-          <form className="new-embed-form">
-            <input type="text" name="embed" placeholder="Embed Name..." />
-          </form>
-        </header>
       );
     }
   });
@@ -228,7 +232,6 @@ var loadApp = function() {
     render : function() {
       return (
         <div className="app wall">
-          <HeaderEl />
           <MainEl />
         </div>
       );
