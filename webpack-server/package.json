@@ -15,7 +15,8 @@
     "reflux": "0.1.x",
     "sass-loader": "^0.2.x",
     "style-loader": "0.8.x",
-    "url-loader": "0.5.x"
+    "url-loader": "0.5.x",
+    "react-draggable": "0.x.x"
   },
   "scripts" : {
     "start" : "pm2 start webpack-server.js"

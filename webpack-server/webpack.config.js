@@ -16,7 +16,7 @@ var pathToRegExp = function(p) {
 
 var getEntry = function(type) {
   var entry = {
-    "vendor" : ['react/addons', 'reflux'],
+    "vendor" : ['react/addons', 'reflux', 'react-draggable'],
     "app" : ['./app/app.jsx']
   };
   if ( type === 'development' ) {

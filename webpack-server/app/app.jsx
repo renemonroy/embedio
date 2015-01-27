@@ -1,7 +1,8 @@
 require('./app.scss');
 
 var React = require('react/addons'),
-  Reflux = require('reflux');
+  Reflux = require('reflux'),
+  Draggable = require('react-draggable');
 
 var loadApp = function() {
 
@@ -200,22 +201,39 @@ var loadApp = function() {
   * live and get rendered like Embeds List.
   */
   var MainEl = React.createClass({
+    // getDefaultProps : function() {
+    //   return { minWidth : 280, maxWidth : 520 };
+    // },
     getInitialState : function() {
-      return { defaultWidth : 320 };
+      var ls = 280;
+      if ( localStorage && (localStorage.getItem('asideWidth') !== null) ) {
+        ls = parseInt(localStorage.getItem('asideWidth'), 10);
+      }
+      return { asideWidth : ls };
     },
-    changeWidth : function(e) {
-      this.setState({ defaultWidth : e.target.value });
+    changeWidth : function(w) {
+      this.setState({ asideWidth : w });
+      if ( localStorage ) localStorage.setItem('asideWidth', w.toString());
+    },
+    handleDrag : function(e, ui) {
+      this.changeWidth(window.innerWidth - ui.position.left);
     },
     render : function() {
-      var st = this.state,
-        objStyles = {
-          width : st.defaultWidth + 'px',
-          height : window.innerHeight
-        };
+      var ps = this.props,
+        st = this.state,
+        handlerStyles = { height : window.innerHeight },
+        handlerStart = { x : window.innerWidth - st.asideWidth, y : 0},
+        asideStyles = { width : st.asideWidth + 'px', height : handlerStyles.height },
+        asideContentWidth = st.asideWidth - 40;
       return (
         <section className="main">
-          <input type="range" min={320} max={480} onChange={this.changeWidth} />
-          <EmbedsListEl style={objStyles} defaultWidth={st.defaultWidth - 40}/>
+          {/*<input type="range" min={ps.minWidth} max={ps.maxWidth} onChange={this.changeWidth} />*/}
+          <Draggable axis="x" zIndex={100} start={handlerStart} onDrag={this.handleDrag} >
+            <div style={handlerStyles}></div>
+          </Draggable>
+          <aside style={asideStyles}>
+            <EmbedsListEl defaultWidth={asideContentWidth}/>
+          </aside>
         </section>
       );
     }
