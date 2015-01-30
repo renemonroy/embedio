@@ -1,7 +1,8 @@
 require('./app.scss');
 
 var React = require('react/addons'),
-  Reflux = require('reflux');
+  Reflux = require('reflux'),
+  debounce = null;
 
 var loadApp = function() {
 
@@ -311,7 +312,8 @@ var loadApp = function() {
     mixins: [Reflux.ListenerMixin],
     componentDidMount : function() {
       window.addEventListener('resize', function(e) {
-        Actions.resizeUI(e);
+        clearTimeout(debounce);
+        debounce = setTimeout(Actions.resizeUI(e), 100);
       });
     },
     render : function() {
