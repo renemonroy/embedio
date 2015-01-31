@@ -130,9 +130,13 @@ var loadApp = function() {
     renderChildren : function() {
       var col = this;
       return React.Children.map(this.props.children, function(child) {
-        return React.addons.cloneWithProps(child, {
-          style : { width : col.state.width + 'px' }
-        });
+        if ( col.props.initialWidth ) {
+          return React.addons.cloneWithProps(child, {
+            colWidth : col.state.width + 'px'
+          });
+        } else {
+          return child;
+        }
       });
     },
     render : function() {
@@ -330,7 +334,7 @@ var loadApp = function() {
     },
     render : function() {
       var st = this.state,
-        listStyles = { height : st.height + 'px' };
+        listStyles = { height : st.height + 'px', width : this.props.colWidth || 'auto' };
       return (
         <ul {...this.props} className="embeds-list" style={listStyles}>
           { this._renderEmbeds() }
