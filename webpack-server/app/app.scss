@@ -20,7 +20,6 @@ body, html {
 body {
   font : 62.5% 'Montserrat', sans-serif;
   color : #29292A;
-  border-right : 1px solid #d1d1d1;
 }
 
 h4 {
@@ -68,6 +67,16 @@ ul {
     border-left : 1px solid #d1d1d1;
     border-right : 1px solid #d1d1d1;
     background-color : #fff;
+    justify-content: center;
+    display : flex;
+    justify-content : center;
+    align-items : center;
+
+    &> .handler-icon {
+      width : 1px;
+      height : 15px;
+      border-right : 1px dotted #a1a1a1;
+    }
   }
 }
 
@@ -148,7 +157,7 @@ ul {
 // }
 //
 .embed {
-  padding : 12px 14px 5px;
+  padding : 12px 10px 5px;
   background-color : #fff;
   margin : 8px auto 0;
   box-shadow : 0 0 3px rgba(0,0,0,.35);

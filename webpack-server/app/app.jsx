@@ -115,9 +115,7 @@ var loadApp = function() {
     mixins : [Reflux.ListenerMixin],
     getInitialState : function() {
       var ps = this.props;
-      return  {
-        width : ps.initialWidth ? parseInt(ps.initialWidth) : null
-      };
+      return  { width : ps.initialWidth ? parseInt(ps.initialWidth) : null };
     },
     componentDidMount : function() {
       this.listenTo(UIStore, this.uiStoreHandler);
@@ -129,12 +127,21 @@ var loadApp = function() {
           break;
       }
     },
+    renderChildren : function() {
+      var col = this;
+      return React.Children.map(this.props.children, function(child) {
+        return React.addons.cloneWithProps(child, {
+          style : { width : col.state.width + 'px' }
+        });
+      });
+    },
     render : function() {
       var st = this.state;
       return (
         <div {...this.props}
           style={{ flex : st.width ? '0 1 ' + st.width + 'px' : '1' }}
           className="ui-column">
+          { this.renderChildren() }
         </div>
       );
     }
@@ -156,7 +163,9 @@ var loadApp = function() {
         ps = row.props,
         columnsList = [];
       ps.children.forEach( function(comp, i) {
-        var colName = "column-" + i;
+        var storeName = ps.storeName ? ps.storeName + '-' : '',
+          colName = storeName + "column-" + i,
+          colWidth = comp.props.colWidth || null;
         if ( i > 0 && row.state.resizable ) {
           columnsList.push(
             <UIDraggable
@@ -165,15 +174,18 @@ var loadApp = function() {
               zIndex={1}
               start={{ x : 0, y : 0 }}
               onDrag={row.handleDrag.bind(row, i)}>
-              <div></div>
+              <div><div className="handler-icon"></div></div>
             </UIDraggable>
           );
         }
+        if ( localStorage.getItem(colName) !== null ) {
+          colWidth = parseInt(localStorage.getItem(colName), 10);
+        }
         columnsList.push(
           <UIColumn
-            key={colName}
-            ref={colName}
-            initialWidth={ comp.props.colWidth || null }>
+            key={ colName }
+            ref={ colName }
+            initialWidth={ colWidth }>
             { comp }
           </UIColumn>
         );
@@ -182,12 +194,18 @@ var loadApp = function() {
     },
     handleDrag : function(i, e, ui) {
       var rfs = this.refs,
-        rCol = rfs['column-' + i],
-        lCol = rfs['column-' + (i - 1)],
+        ps = this.props,
+        storeName = ps.storeName ? ps.storeName + '-' : '',
+        rColName = storeName + 'column-' + i,
+        lColName = storeName + 'column-' + (i - 1),
+        rCol = rfs[rColName],
+        lCol = rfs[lColName],
         rColW = (rCol.state.width || parseInt(rCol.getDOMNode().offsetWidth)) - e.movementX,
         lColW = (lCol.state.width || parseInt(lCol.getDOMNode().offsetWidth)) + e.movementX;
       rCol.setState({ width : rColW });
       lCol.setState({ width : lColW });
+      if ( ps.storeName && rCol.props.initialWidth ) localStorage.setItem(rColName, rColW.toString());
+      if ( ps.storeName && lCol.props.initialWidth ) localStorage.setItem(lColName, lColW.toString());
     },
     render : function() {
       var ps = this.props;
@@ -221,17 +239,27 @@ var loadApp = function() {
   */
   var Embed = React.createClass({
     displayName : 'Embed',
+    updateStyles : function() {
+      var pms = this.props.params,
+        defaultWidth = pms.defaultWidth;
+      if ( pms.width <= defaultWidth )
+        return { width : pms.width, height : pms.height };
+      else {
+        var newHeight = (pms.height/pms.width) * defaultWidth;
+        return { width : defaultWidth, height : newHeight};
+      }
+    },
     _renderEmbed : function(ps) {
       var ps = this.props;
       switch (ps.params.type) {
         case 'video' :
-          return <div className="embed-video" dangerouslySetInnerHTML={{__html: ps.params.html }}></div>;
+          return <div className="embed-video" style={this.updateStyles()} dangerouslySetInnerHTML={{__html: ps.params.html }}></div>;
           break;
         case 'photo' :
-          return <div className="embed-image" ><img src={ps.params.url} /></div>;
+          return <div className="embed-image" style={this.updateStyles()} ><img src={ps.params.url} /></div>;
           break;
         case 'rich' :
-          return <div className="embed-rich" dangerouslySetInnerHTML={{__html: ps.params.html }}></div>;
+          return <div className="embed-rich" style={this.updateStyles()} dangerouslySetInnerHTML={{__html: ps.params.html }}></div>;
           break;
         default :
           return null;
@@ -263,6 +291,9 @@ var loadApp = function() {
     getInitialState : function() {
       return { embedsList : [], height : window.innerHeight };
     },
+    getDefaultProps : function() {
+      return { xPaddings : 10 };
+    },
     componentDidMount : function() {
       this.listenTo(EmbedsStore, this.embedsStoreHandler);
       Actions.getEmbeds();
@@ -277,11 +308,15 @@ var loadApp = function() {
     },
     _renderEmbeds : function() {
       var comp = this,
+        ps = comp.props,
         embeds = null,
-        embedsList = comp.state.embedsList;
+        embedsList = comp.state.embedsList,
+        colWidth = comp.props.colWidth || '240px';
       if ( embedsList.length > 0 ) {
         embeds = [];
+        colWidth = parseInt(comp.getDOMNode().offsetWidth - (ps.xPaddings * 2));
         embedsList.forEach( function(embed, i) {
+          embed.defaultWidth = colWidth;
           embeds.push(
             <Embed
               ref={'embed-' + embed._id}
@@ -320,9 +355,9 @@ var loadApp = function() {
       return (
         <div className="app embedio">
           <UIView className="embeds">
-            <UIRow resizable={true}>
+            <UIRow resizable={true} storeName="embedsRow">
               <article className="active-embed">Article</article>
-              <EmbedsList colWidth="300px" />
+              <EmbedsList colWidth="300px"/>
             </UIRow>
           </UIView>
         </div>
