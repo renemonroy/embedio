@@ -16,7 +16,8 @@ var loadApp = function() {
   */
   var Actions = Reflux.createActions([
     "resizeUI",
-    "getEmbeds"
+    "getEmbeds",
+    "activateEmbed"
   ]);
 
   /* ----------------------------------------------------------- +
@@ -83,6 +84,7 @@ var loadApp = function() {
     apiUrl : window._INFO.ctx + '/api/embeds',
     init : function() {
       this.listenTo(Actions.getEmbeds, this.getEmbeds);
+      this.listenTo(Actions.activateEmbed, this.activateEmbed);
     },
     getEmbeds : function(e) {
       var store = this;
@@ -93,6 +95,13 @@ var loadApp = function() {
         obj.storeAction = 'getEmbeds';
         store.trigger(obj);
       });
+    },
+    activateEmbed : function(embed) {
+      var store = this,
+        obj = {};
+      obj.embed = embed;
+      obj.storeAction = 'activateEmbed';
+      store.trigger(obj);
     }
   });
 
@@ -243,6 +252,20 @@ var loadApp = function() {
   */
   var Embed = React.createClass({
     displayName : 'Embed',
+    mixins: [Reflux.ListenerMixin],
+    getInitialState : function() {
+      return { active : false };
+    },
+    componentDidMount : function() {
+      this.listenTo(EmbedsStore, this.embedsStoreHandler);
+    },
+    embedsStoreHandler : function(e) {
+      switch (e.storeAction) {
+        case 'activateEmbed' :
+          this.setState({ active : (e.embed._id === this.props.params._id ? true : false) });
+          break;
+      }
+    },
     updateStyles : function() {
       var pms = this.props.params,
         defaultWidth = pms.defaultWidth;
@@ -253,7 +276,11 @@ var loadApp = function() {
         return { width : defaultWidth, height : newHeight};
       }
     },
-    _renderEmbed : function(ps) {
+    activate : function(e) {
+      e.preventDefault();
+      Actions.activateEmbed(this.props.params);
+    },
+    _renderType : function(ps) {
       var ps = this.props;
       switch (ps.params.type) {
         case 'video' :
@@ -270,12 +297,21 @@ var loadApp = function() {
           break;
       }
     },
+    _renderOverlay : function() {
+      if ( this.props.params.selfActive ) {
+        return <div className="embed-overlay" onClick={this.activate}></div>;
+      } else {
+        return null;
+      }
+    },
     render : function() {
-      var ps = this.props;
+      var ps = this.props,
+        embedClass = "embed" + (this.state.active ? ' active' : '');
       return (
-        <li {...this.props} className="embed">
+        <li {...this.props} className={ embedClass }>
           <div className="embed-body">
-            { this._renderEmbed() }
+            { this._renderType() }
+            { this._renderOverlay() }
           </div>
           <div className="embed-footer">
             <h4>{ ps.params.title }</h4>
@@ -321,6 +357,7 @@ var loadApp = function() {
         colWidth = parseInt(comp.getDOMNode().offsetWidth - (ps.xPaddings * 2));
         embedsList.forEach( function(embed, i) {
           embed.defaultWidth = colWidth;
+          embed.selfActive = true;
           embeds.push(
             <Embed
               ref={'embed-' + embed._id}
