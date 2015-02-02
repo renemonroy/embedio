@@ -298,11 +298,7 @@ var loadApp = function() {
       }
     },
     _renderOverlay : function() {
-      if ( this.props.params.selfActive ) {
         return <div className="embed-overlay" onClick={this.activate}></div>;
-      } else {
-        return null;
-      }
     },
     render : function() {
       var ps = this.props,
@@ -311,7 +307,7 @@ var loadApp = function() {
         <li {...this.props} className={ embedClass }>
           <div className="embed-body">
             { this._renderType() }
-            { this._renderOverlay() }
+            { ps.params.selfActive ? this._renderOverlay() : null }
           </div>
           <div className="embed-footer">
             <h4>{ ps.params.title }</h4>
@@ -380,6 +376,38 @@ var loadApp = function() {
     }
   });
 
+  var ActiveEmbed = React.createClass({
+    displayName : 'MainArticle',
+    mixins: [Reflux.ListenerMixin, HelpersMixin],
+    getInitialState : function() {
+      return { activeEmbed : null };
+    },
+    componentDidMount : function() {
+      this.listenTo(EmbedsStore, this.embedsStoreHandler);
+    },
+    embedsStoreHandler : function(e) {
+      switch (e.storeAction) {
+        case 'activateEmbed' :
+          this.setState({ activeEmbed : e.embed });
+          break;
+        }
+    },
+    _renderEmbed : function() {
+      var e = this.state.activeEmbed,
+        k = 'active-embed-' + e._id;
+      e.selfActive = false;
+      return (<Embed key={k} params={ e } />);
+    },
+    render : function() {
+      var st = this.state;
+      return (
+        <article className="active-embed">
+          { st.activeEmbed ? this._renderEmbed() : null }
+        </article>
+      );
+    }
+  });
+
   /**
   * The principal component that renders the entire application.
   */
@@ -397,7 +425,7 @@ var loadApp = function() {
         <div className="app embedio">
           <UIView className="embeds">
             <UIRow resizable={true} storeName="embedsRow">
-              <article className="active-embed">Article</article>
+              <ActiveEmbed />
               <EmbedsList colWidth="300px"/>
             </UIRow>
           </UIView>
