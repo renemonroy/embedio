@@ -304,7 +304,7 @@ var loadApp = function() {
       var ps = this.props,
         embedClass = "embed" + (this.state.active ? ' active' : '');
       return (
-        <li {...this.props} className={ embedClass }>
+        <div {...this.props} className={ embedClass }>
           <div className="embed-body">
             { this._renderType() }
             { ps.params.selfActive ? this._renderOverlay() : null }
@@ -312,7 +312,7 @@ var loadApp = function() {
           <div className="embed-footer">
             <h4>{ ps.params.title }</h4>
           </div>
-        </li>
+        </div>
       );
     }
   });
@@ -369,18 +369,18 @@ var loadApp = function() {
       var st = this.state,
         listStyles = { height : st.height + 'px', width : this.props.colWidth || 'auto' };
       return (
-        <ul {...this.props} className="embeds-list" style={listStyles}>
+        <div {...this.props} className="embeds-list" style={listStyles}>
           { this._renderEmbeds() }
-        </ul>
+        </div>
       );
     }
   });
 
-  var ActiveEmbed = React.createClass({
-    displayName : 'MainArticle',
+  var EmbedSelected = React.createClass({
+    displayName : 'EmbedSelected',
     mixins: [Reflux.ListenerMixin, HelpersMixin],
     getInitialState : function() {
-      return { activeEmbed : null };
+      return { embed : null };
     },
     componentDidMount : function() {
       this.listenTo(EmbedsStore, this.embedsStoreHandler);
@@ -388,21 +388,23 @@ var loadApp = function() {
     embedsStoreHandler : function(e) {
       switch (e.storeAction) {
         case 'activateEmbed' :
-          this.setState({ activeEmbed : e.embed });
+          this.setState({ embed : e.embed });
           break;
         }
     },
     _renderEmbed : function() {
-      var e = this.state.activeEmbed,
-        k = 'active-embed-' + e._id;
-      e.selfActive = false;
-      return (<Embed key={k} params={ e } />);
+      var st = this.state,
+        embed = st.embed;
+      if ( st.embed ) {
+        embed = <div className="embed" dangerouslySetInnerHTML={{__html: st.embed.html }}></div>;
+      }
+      return embed;
     },
     render : function() {
       var st = this.state;
       return (
-        <article className="active-embed">
-          { st.activeEmbed ? this._renderEmbed() : null }
+        <article>
+          { this._renderEmbed() }
         </article>
       );
     }
@@ -425,7 +427,7 @@ var loadApp = function() {
         <div className="app embedio">
           <UIView className="embeds">
             <UIRow resizable={true} storeName="embedsRow">
-              <ActiveEmbed />
+              <EmbedSelected />
               <EmbedsList colWidth="300px"/>
             </UIRow>
           </UIView>
